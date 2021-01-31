@@ -37,7 +37,22 @@ class MunkiLibAdapter:
 
     def find_matching_pkginfo(self, pkginfo):
         match = self.munkiimportlib.find_matching_pkginfo(self.repo, pkginfo)
-        return match
+
+        if "installer_item_hash" in pkginfo and pkginfo[
+            "installer_item_hash"
+        ] == match.get("installer_item_hash"):
+            # we have an item with the exact same checksum hash in the repo
+            return match
+
+        if pkginfo["version"] == match["version"]:
+            # we have an item with the same version in the repo
+            return match
+
+        if "receipts" in pkginfo and pkginfo["receipts"] == match.get("receipts"):
+            # we have an item with the same receipts in the repo
+            return match
+
+        return None
 
     def copy_pkg_to_repo(self, pkginfo, pkg_path):
         uploaded_path = self.munkiimportlib.copy_item_to_repo(
